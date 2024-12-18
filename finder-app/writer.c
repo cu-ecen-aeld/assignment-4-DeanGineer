@@ -8,10 +8,15 @@ int main(int argc, char* argv[]){
 	char* writestr;
 	FILE* fp;
 	
-	//check if args are less than 2
-	if(argc < 2)
-		return 1;
+	openlog("aeld", LOG_PID | LOG_CONS, LOG_USER);
+	syslog(LOG_INFO, "Syslog started");
+
 	
+	//check if args are less than 2
+	if(argc < 3){
+		syslog(LOG_ERR, "Arguments are less than expected");
+		return 1;
+	}
 	
 	//full path to a file (including filename)
 	fullfilepath = argv[1];
@@ -20,13 +25,18 @@ int main(int argc, char* argv[]){
 	//assignment tells us to assume directories are already created
 	
 	//now open file and write to it
-	fp = fopen(fullfilepath, "r+");
-	if(!fp)
+	fp = fopen(fullfilepath, "w+");
+	if(!fp){
+		syslog(LOG_ERR, "Cannot open the file");
 		return 1;
+	}
 		
-	fprintf(fp, writestr);
+	fprintf(fp, "%s", writestr);
 	
+	
+	syslog(LOG_INFO, "Performing cleanup before exit...");
 	fclose(fp);
+	closelog();
 	
 	
 	
