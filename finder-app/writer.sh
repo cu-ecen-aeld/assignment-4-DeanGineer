@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# full path to a file (including filename)
-writefile=$1
-# a text string which will be written within this file
-writestr=$2
-
 if [ "$#" -lt 2 ]; then
 	echo "Invalid args"
 	exit 1
 fi
+
+# full path to a file (including filename)
+writefile=$1
+# a text string which will be written within this file
+writestr=$2
 
 dir=$(dirname "$writefile")
 if [ ! -d "$dir" ]; then
