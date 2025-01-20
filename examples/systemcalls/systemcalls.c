@@ -17,6 +17,12 @@ bool do_system(const char *cmd)
  *   or false() if it returned a failure
 */
 
+	if(system(cmd) == -1){
+		return false;
+	}
+
+
+
     return true;
 }
 
@@ -60,6 +66,31 @@ bool do_exec(int count, ...)
 */
 
     va_end(args);
+    
+    pid_t pid = fork();
+    if (pid < 0) {
+        perror("fork fail");
+        return false;
+    } else if (pid == 0) {
+        // Child process
+        execv(command[0], command);
+        // If execv returns, an error occurred
+        perror("execv");
+        exit(EXIT_FAILURE);
+    } else {
+        // Parent process
+        int status;
+        if (waitpid(pid, &status, 0) == -1) {
+            perror("waitpid fail");
+            return false;
+        }
+        if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
     return true;
 }
@@ -93,7 +124,46 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
  *
 */
 
-    va_end(args);
+	va_end(args);
+
+	//the reference
+	int kidpid;
+	int fd = open(outputfile, O_WRONLY|O_TRUNC|O_CREAT, 0644);
+	if (fd < 0){
+		perror("open"); 
+		abort();
+		}
+		//the switch below is same as do_exec()
+	switch (kidpid = fork()) {
+		case -1: 
+				perror("fork"); 
+				abort();
+		case 0:
+				if (dup2(fd, 1) < 0){ 
+					perror("dup2"); 
+					abort(); 
+				}
+				close(fd);
+				// Child process
+				execv(command[0], command);
+				// If execv returns, an error occurred
+				perror("execv");
+				exit(EXIT_FAILURE);
+				abort();
+		default:
+				close(fd);
+				// Parent process
+			int status;
+        if (waitpid(kidpid, &status, 0) == -1) {
+            perror("waitpid fail");
+            return false;
+        }
+        if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+            return true;
+        } else {
+            return false;
+        }
+}
 
     return true;
 }
