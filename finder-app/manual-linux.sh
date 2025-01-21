@@ -12,6 +12,7 @@ BUSYBOX_VERSION=1_33_1
 FINDER_APP_DIR=$(realpath $(dirname $0))
 #exporting the files below so that I wont be explicitly calling it every `make` command and
 #the target for this assignment is the environment below only
+CORES=$(nproc)
 export ARCH=arm64
 export CROSS_COMPILE=aarch64-none-linux-gnu-
 
@@ -37,6 +38,17 @@ if [ ! -e ${OUTDIR}/linux-stable/arch/${ARCH}/boot/Image ]; then
     git checkout ${KERNEL_VERSION}
 
     # TODO: Add your kernel build steps here
+    # Since I already exported the target build system, i dont need to call it for every make
+    #clean
+    make mrproper
+    #default configuration
+    make defconfig
+    #build the kernel with all cores in the current system
+    make -j${CORES} all
+    #modules
+    make modules
+    #device tree
+    make dtbs
 fi
 
 echo "Adding the Image in outdir"
