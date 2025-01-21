@@ -10,8 +10,10 @@ KERNEL_REPO=git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.gi
 KERNEL_VERSION=v5.15.163
 BUSYBOX_VERSION=1_33_1
 FINDER_APP_DIR=$(realpath $(dirname $0))
-ARCH=arm64
-CROSS_COMPILE=aarch64-none-linux-gnu-
+#exporting the files below so that I wont be explicitly calling it every `make` command and
+#the target for this assignment is the environment below only
+export ARCH=arm64
+export CROSS_COMPILE=aarch64-none-linux-gnu-
 
 if [ $# -lt 1 ]
 then
