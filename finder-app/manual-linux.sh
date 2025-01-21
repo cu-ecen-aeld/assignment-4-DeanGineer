@@ -77,14 +77,13 @@ git clone git://busybox.net/busybox.git
     # TODO:  Configure busybox
     make distclean
     make defconfig
-    make
-    make CONFIG_PREFIX=$OUTDIR/rootfs install
-    
 else
     cd busybox
 fi
 
 # TODO: Make and install busybox
+	make
+    make CONFIG_PREFIX=$OUTDIR/rootfs install
 
 echo "Library dependencies"
 ${CROSS_COMPILE}readelf -a bin/busybox | grep "program interpreter"
