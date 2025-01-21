@@ -75,6 +75,11 @@ git clone git://busybox.net/busybox.git
     cd busybox
     git checkout ${BUSYBOX_VERSION}
     # TODO:  Configure busybox
+    make distclean
+    make defconfig
+    make
+    make CONFIG_PREFIX=$OUTDIR/rootfs install
+    
 else
     cd busybox
 fi
