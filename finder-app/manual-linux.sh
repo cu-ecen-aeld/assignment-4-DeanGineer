@@ -62,11 +62,11 @@ then
 fi
 
 # TODO: Create necessary base directories
-	mkdir rootfs
-	cd rootfs
-	mkdir -p bin dev etc home lib lib64 proc sbin sys tmp usr var
-	mkdir -p usr/bin usr/lib usr/sbin
-	mkdir -p var/log
+mkdir rootfs
+cd rootfs
+mkdir -p bin dev etc home lib lib64 proc sbin sys tmp usr var
+mkdir -p usr/bin usr/lib usr/sbin
+mkdir -p var/log
 
 cd "$OUTDIR"
 if [ ! -d "${OUTDIR}/busybox" ]
@@ -90,14 +90,33 @@ ${CROSS_COMPILE}readelf -a bin/busybox | grep "program interpreter"
 ${CROSS_COMPILE}readelf -a bin/busybox | grep "Shared library"
 
 # TODO: Add library dependencies to rootfs
+#Since the program interpreter and shared libraries were given in the video 
+#i wont bother searching for them dynamically
+
+PATH_TO_XCOMPILE=$(dirname $(which ${CROSS_COMPILE}gcc))
+PATH_TO_XCOMPILE_PARENT_DIR=$(dirname $PATH_TO_XCOMPILE)
+cp ${PATH_TO_XCOMPILE_PARENT_DIR}/libc/lib/ld-linux-aarch64.so.1 ${OUTDIR}/rootfs/lib
+cp ${PATH_TO_XCOMPILE_PARENT_DIR}/libc/lib64/libm.so.6 ${OUTDIR}/rootfs/lib64
+cp ${PATH_TO_XCOMPILE_PARENT_DIR}/libc/lib64/libresolv.so.2 ${OUTDIR}/rootfs/lib64
+cp ${PATH_TO_XCOMPILE_PARENT_DIR}/libc/lib64/libc.so.6 ${OUTDIR}/rootfs/lib64
 
 # TODO: Make device nodes
+sudo mknod -m 666 /dev/null c 1 3
+sudo mknod -m 666 /dev/console c 5 1
 
 # TODO: Clean and build the writer utility
+#return to finder app
+cd ${FINDER_APP_DIR}
+make clean
+make all
 
 # TODO: Copy the finder related scripts and executables to the /home directory
 # on the target rootfs
+cp -fR * ${OUTDIR}/rootfs/home/
 
 # TODO: Chown the root directory
+chown root:root ${OUTDIR}/rootfs
 
 # TODO: Create initramfs.cpio.gz
+find . | cpio -H newc -ov --owner root:root > ${OUTDIR}/initramfs.cpio
+gzip -f initramfs.cpio
