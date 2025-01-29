@@ -18,16 +18,16 @@ void* threadfunc(void* thread_param)
     struct thread_data* thread_func_args = (struct thread_data *) thread_param;
     
     //wait
-    printf("Thread %d: Waiting for %d ms before locking mutex.\n", thread_func_args->t_id, thread_func_args->wait_delay);
+    DEBUG_LOG("Thread %d: Waiting for %d ms before locking mutex.\n", thread_func_args->t_id, thread_func_args->wait_delay);
     usleep(thread_func_args->wait_delay);  // Initial wait before locking
 	//obtain mutex
-    printf("Thread %d: Trying to lock the mutex...\n", thread_func_args->t_id);
+    DEBUG_LOG("Thread %d: Trying to lock the mutex...\n", thread_func_args->t_id);
     pthread_mutex_lock(thread_func_args->mutex);  // Lock mutex
 	//wait
-    printf("Thread %d: Locked mutex, waiting inside for %d ms.\n", thread_func_args->t_id, thread_func_args->wait_hold);
+    DEBUG_LOG("Thread %d: Locked mutex, waiting inside for %d ms.\n", thread_func_args->t_id, thread_func_args->wait_hold);
     usleep(thread_func_args->wait_hold);  // Wait while holding the mutex
 	//release mutex
-    printf("Thread %d: Releasing the mutex.\n", thread_func_args->t_id);
+    DEBUG_LOG("Thread %d: Releasing the mutex.\n", thread_func_args->t_id);
     pthread_mutex_unlock(thread_func_args->mutex);  // Unlock mutex
     
     
@@ -68,7 +68,7 @@ bool start_thread_obtaining_mutex(pthread_t *thread, pthread_mutex_t *mutex,int 
 	}
      
      
-    printf("This point should not be reached!\n");
+    ERROR_LOG("This point should not be reached!\n");
     return false;
 }
 
